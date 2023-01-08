@@ -18,10 +18,6 @@ import collections
 import functools
 import operator
 
-# Standard pallets' characteristics
-PALLET_SIZE = (120, 80, 150)
-PALLET_MAX_WEIGHT = 450
-
 
 
 class HashableDict (dict):
@@ -34,9 +30,8 @@ class HashableDict (dict):
 
 
 class Pallet (object):
-    """
-    An instance of this class represents a pallet.
-    """
+    
+    """ An instance of this class represents a pallet """
 
     def __init__ (self, size, max_weight):
         """
@@ -56,7 +51,6 @@ class Pallet (object):
         self.sorted_orderlines = []
         self.weight = 0
         self.volume = 0
-        self.active = True       # Used only by the sequential procedure
 
     def __hash__ (self):
         """

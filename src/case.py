@@ -1,21 +1,6 @@
-"""
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-This file is part of the implementation of an algorithm for solving the
-3-dimensional case picking problem. A newly considered problem of operational
-research that combines the routing of pickers into the warehouse, with the
-positioning of 3-dimensional items inside pallets (i.e., Pallet Loading Problem).
-
-The algorithm proposed and implemented comes from a collaboration between the
-Department of Engineering at University of Parma (Parma, ITALY) and the
-IN3 Computer Science Dept. at Universitat Oberta de Catalunya (Barcelona, SPAIN).
-
-
-Written by Mattia Neroni Ph.D., Eng. in July 2021.
-Author' contact: mattianeroni93@gmail.com
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-"""
 
 def resetCase(case):
+    """ Reset the characteristics of a case """
     currentItem = case.__copy__()
     currentItem.busyCorners = [False, False, False]
     currentItem.canHold = currentItem.strength
@@ -23,28 +8,22 @@ def resetCase(case):
     
 
 def rotate (case):
-    """
-    Method used to rotate a case of 90° on the horizontal plan.
-    :param case: <Case> The case to rotate.
-    """
+    """ Method used to rotate a case of 90° on the horizontal plan """
     case.rotated = not case.rotated
     case.sizex, case.sizey = case.sizey, case.sizex
 
 
-class Case (object):
-    """
-    An instance of this class represent one of the rectangular-shaped 3-dimensional cases
-    to place into the pallets.
-    """
+class Case:
+    
+    """ One of the cases to place into the pallet """
+
     def __init__ (self, orderline, code, sizex, sizey, sizez, weight, strength):
         """
-        Constructor.
-
-        :param orderline: <OrderLine> the orderline the case belongs to
-        :param code: <char> the code of the case (the type of product it contains)
-        :param sizex, sizey, sizez: <int> the dimensions of the case
-        :param weight: <int> the weight of the case
-        :param strength: <int> the strenght of the case (i.e., the number of cases it can hold above)
+        :param orderline: The orderline the case belongs to
+        :param code: The code of the case (the type of product it contains)
+        :param sizex, sizey, sizez: The dimensions of the case
+        :param weight: The weight of the case
+        :param strength: The strenght of the case (i.e., the number of cases it can hold above)
         """
         self.orderline = orderline
         self.code = code
@@ -70,9 +49,6 @@ class Case (object):
         obj.__dict__.update(self.__dict__)
         obj.busyCorners = list(self.busyCorners)
         return obj
-
-    #def __eq__(self, other):
-    #    return self.code == other.code and self.orderline == other.orderline
 
     @property
     def position (self):
