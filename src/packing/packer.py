@@ -1,25 +1,9 @@
-"""
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-This file is part of the implementation of an algorithm for solving the
-3-dimensional case picking problem. A newly considered problem of operational
-research that combines the routing of pickers into the warehouse, with the
-positioning of 3-dimensional items inside pallets (i.e., Pallet Loading Problem).
-
-The algorithm proposed and implemented comes from a collaboration between the
-Department of Engineering at University of Parma (Parma, ITALY) and the
-IN3 Computer Science Dept. at Universitat Oberta de Catalunya (Barcelona, SPAIN).
-
-
-Written by Mattia Neroni Ph.D., Eng. in July 2021.
-Author' contact: mattianeroni93@gmail.com
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-"""
 import operator
 import collections
 import functools
 
-from .case import rotate
-from .pallet import HashableDict
+from src.case import rotate
+from src.pallet import HashableDict
 
 
 # Initialize the parameters of the algorithm
@@ -249,7 +233,13 @@ def fit (currentItem, pallet, packed, layersMap):
 
 
 @functools.lru_cache(maxsize=1024)
-def dubePacker (pallet, hosted):
+def cacheDubePacker (pallet, sortedCases):
+    """ Same as dubePacker but caching the results """
+    return dubePacker(pallet, sortedCases)
+
+
+
+def dubePacker (pallet, sortedCases):
     """
      The algorithm implemented in this method is a modified version of the one proposed by:
      Dube, E., Kanavathy, L. R., & Woodview, P. (2006). Optimizing Three-Dimensional
@@ -263,8 +253,8 @@ def dubePacker (pallet, hosted):
           placement)
 
 
-     :param pallet: <Pallet> The pallet in which cases must be placed.
-     :param hosted: <Pallet | OrderLine> The pallet or orderline containing the cases to place .
+     :param pallet: The pallet in which cases must be placed.
+     :param sortedCases: (tuple) The cases to place, in the order in which they should be considered 
 
      :return: <tuple> The first element is True if the packing has been successful
                 and False otherwise, the second returns the set of packed items with
@@ -281,8 +271,9 @@ def dubePacker (pallet, hosted):
     # corresponding to each OrderLine
     layersMap = HashableDict(pallet.layersMap)
 
+    # Deprecated..
     # Sort cases for decreasing strength
-    sortedCases = sorted(hosted, key=operator.attrgetter('strength'), reverse=True)
+    #sortedCases = sorted(hosted, key=operator.attrgetter('strength'), reverse=True)
 
     # For each item to pack
     for currentItem in sortedCases:
@@ -340,7 +331,9 @@ def dubePacker (pallet, hosted):
 
             # If all positions have been tried and the packing is not possible
             # there is no feasible solution.
-            if toPack: return False, packed, layersMap
+            if toPack: 
+                return False, packed, layersMap
+
             # If currentItem has been packed add it to the list of packed
             packed.append(currentItem)
 

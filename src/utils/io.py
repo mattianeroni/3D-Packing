@@ -6,7 +6,14 @@ from src.case import Case
 
 
 def read_test (filename, delimiter=","):
-    """ Read the csv file with the problem to solve """
+    """ 
+    Read the csv file with the problem to solve.
+    
+    :param filename: The csv file where the problem is reported
+    :param delimiter: The csv delimiter char
+    :return: A set of orders, each of which is made of a set of orderlines, each 
+            of which is reuiring a certain product in a certain quantity (i.e., number of cases)
+    """
     file = pd.read_csv(filename, delimiter=",").groupby("OrderID")
     orders = {}
 

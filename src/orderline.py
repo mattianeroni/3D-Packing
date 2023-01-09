@@ -23,15 +23,32 @@ class OrderLine:
         :param cases: The cases required.
         """
         self.__i = 0            # Counter used to iterate the pallet cases
-        self.cases = collections.deque(cases or [])
+        self.cases = cases or tuple()
         self.weight = 0
         self.volume = 0
         self.pallet = None
 
     @property 
     def code (self):
-        """ The required product """
-        return self.cases[0].code if len(self.cases) > 0 else None
+        """ The required product 
+        NOTE: We suppose each orderline contains one and only one product.
+        """
+        if self.cases:
+            return self.cases[0].code 
+
+
+    @property 
+    def strength (self):
+        """ The strength of the orderline 
+        NOTE: We suppose each orderline contains one and only one product.
+         """
+        if self.cases:
+            return self.cases[0].strength 
+
+
+    def __repr__(self):
+        return f"OrderLine(code={self.code}, n={len(self.cases)})"
+
 
     def __hash__(self):
         """
@@ -40,6 +57,7 @@ class OrderLine:
         """
         return hash(str(self))
 
+
     def __lt__(self, other):
         """
         The hashable orderlines must also be sortable. This is needed
@@ -47,9 +65,11 @@ class OrderLine:
         """
         return self.code < other.code
 
+
     def __iter__(self):
         self.__i = 0
         return self 
+
 
     def __next__(self):
         if self.__i < len(self.cases):

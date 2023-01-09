@@ -1,22 +1,14 @@
-"""
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-This file is part of the implementation of an algorithm for solving the
-3-dimensional case picking problem. A newly considered problem of operational
-research that combines the routing of pickers into the warehouse, with the
-positioning of 3-dimensional items inside pallets (i.e., Pallet Loading Problem).
-
-The algorithm proposed and implemented comes from a collaboration between the
-Department of Engineering at University of Parma (Parma, ITALY) and the
-IN3 Computer Science Dept. at Universitat Oberta de Catalunya (Barcelona, SPAIN).
-
-
-Written by Mattia Neroni Ph.D., Eng. in July 2021.
-Author' contact: mattianeroni93@gmail.com
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-"""
 import collections
 import functools
 import operator
+
+
+
+def pallets_generator (size, max_weight):
+    """ This is a generator of pallets with standard dimensions and weight
+    capacity """
+    while True:
+        yield Pallet(size, max_weight)
 
 
 
@@ -29,17 +21,20 @@ class HashableDict (dict):
         return hash(tuple(sorted(self.items())))
 
 
-class Pallet (object):
+class Pallet:
     
     """ An instance of this class represents a pallet """
 
     def __init__ (self, size, max_weight):
         """
-        :attr layersMap: <dict<OrderLine,int>> hashmap that keeps track of the layer
+        :param size: The maximum pallet size (x, y, z)
+        :param max_weight: The pallet weight capacity
+
+        :attr layersMap: HashableDict {OrderLine : int} that keeps track of the layer
                         that each orderline occupies into the pallet.
                         This is very important to understand in which order the storage
                         locations can be visited.
-        :attr orderlines: <set<OrderLine>> the set of orderlines kept into this pallet.
+        :attr orderlines: The set of orderlines stored into this pallet.
         """
         self.__i = 0             # Counter used to iterate the pallet cases
         self.size = size
@@ -48,21 +43,26 @@ class Pallet (object):
         self.cases = collections.deque()
         self.layersMap = HashableDict()
         self.orderlines = set()
-        self.sorted_orderlines = []
         self.weight = 0
         self.volume = 0
 
     def __hash__ (self):
-        """
-        Method implemented to make the pallet hashable for caching.
-        """
+        """ Method implemented to make the pallet hashable for caching """
         return hash(self.layersMap)
 
+    @property 
+    def max_can_hold (self):
+        """ The maximum number of additional cases the pallet can hold """
+        return max(i.canHold for case in self.cases)
+
+    @property 
+    def min_can_hold (self):
+        """ The minimum number of additional cases the pallet can hold """
+        return min(i.canHold for case in self.cases)
 
     def __iter__(self):
         self.__i = 0
         return self 
-
 
     def __next__(self):
         if self.__i < len(self.cases):
