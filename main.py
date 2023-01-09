@@ -28,9 +28,10 @@ if __name__ == "__main__":
 
     for order_id, order in orders.items():
         start_time = time.time()
-        pallets = best_fit(order, generator, dubePacker)
+        pallets = first_fit(order, generator, dubePacker)
         end_time = time.time()
 
+        print(f"OrderID: {order_id}")
         print(f"Computational time: {end_time - start_time}s")
 
         for p in pallets:

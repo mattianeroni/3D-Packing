@@ -18,7 +18,7 @@ def next_fit (order, pallets_generator, packer):
     
     # Sort orderlines according for ascending strength
     # NOTE: This is not that reasonable in this case (to reconsider)
-    orderlines = sorted(order, key=operator.attrgetter("strength"), reverse=True)
+    orderlines = sorted(order, key=lambda i: (i.strength, i.volume), reverse=True)
 
     for orderline in orderlines:
         done, packedCases, layersMap = packer(last_pallet, orderline)

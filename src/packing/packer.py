@@ -288,12 +288,11 @@ def dubePacker (pallet, orderline):
     if not preliminaryCheck(pallet, orderline):
         return False, packed, layersMap
 
-    # Deprecated..
     # Sort cases for decreasing strength
-    #sortedCases = sorted(hosted, key=operator.attrgetter('strength'), reverse=True)
+    sortedCases = sorted(orderline.cases, key=operator.attrgetter('volume'), reverse=True)
 
     # For each item to pack
-    for currentItem in orderline.cases:
+    for currentItem in sortedCases:
         currentItem = currentItem.__copy__()
         currentItem.busyCorners = [False, False, False]
         currentItem.canHold = currentItem.strength

@@ -32,7 +32,7 @@ def best_fit (order, pallets_generator, packer, evaluation=None):
     
     # Sort orderlines according for ascending strength
     # NOTE: This is not that reasonable in this case (to reconsider)
-    orderlines = sorted(order, key=operator.attrgetter("strength"), reverse=True)
+    orderlines = sorted(order, key=lambda i: (i.strength, i.volume), reverse=True)
 
     for orderline in orderlines:
         sorted_pallets = sorted(pallets, key=functools.partial(evaluation, orderline=orderline))
