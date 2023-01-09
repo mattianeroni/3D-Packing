@@ -1,29 +1,42 @@
 import collections 
 import operator 
+import functools
 
 
-def first_fit (order, pallets_generator, packer):
+def best_fit (order, pallets_generator, packer, evaluation=None):
     """
     Best Fit Aprroach.
-    Every time a new packing is required, all pallets from the first to the
-    last one are considered. If none of them can host the new cases, a new 
-    pallet is started.
+    Every time a new packing is required, the pallets are prioritized
+    according to a provided function.
+    If none of the pallets is feasible, a new pallet is started.
 
     :param order: The customer order to process as a set of orderlines.
     :param pallets_generator: A generator of standardized pallets.
     :param packer: The packing algorithm.
+    :param evaluation: A function hat takes as arguments (pallet, orderline)
+                    and returns a number. The lower is the number the better is
+                    the assignment.
+                    If None, we prioritize the pallets with the minor 
+                    remaining volume. 
 
     :return: A set of pallets able to contain the required products.
     """
     last_pallet = next(pallets_generator)
-    pallets = collections.deque((last_pallet,))
+    pallets = [last_pallet,]
+
+    if evaluation is None:
+        def evaluation (pallet, orderline):
+            if pallet.volume + orderline.volume > pallet.maxVolume:
+                return float('inf')
+            return pallet.maxVolume - pallet.volume
     
     # Sort orderlines according for ascending strength
     # NOTE: This is not that reasonable in this case (to reconsider)
     orderlines = sorted(order, key=operator.attrgetter("strength"), reverse=True)
 
     for orderline in orderlines:
-        packing_result = next( ((i, pallet) for pallet in pallets if (i := packer(pallet, orderline))[0]), None )
+        sorted_pallets = sorted(pallets, key=functools.partial(evaluation, orderline=orderline))
+        packing_result = next( ((i, pallet) for pallet in sorted_pallets if (i := packer(pallet, orderline))[0]), None )
         
         # Start a new pallet...
         if packing_result is None:

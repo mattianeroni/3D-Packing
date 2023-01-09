@@ -16,7 +16,7 @@ if __name__ == "__main__":
 
     # Standard pallets' characteristics
     PALLET_SIZE = (120, 200, 150)
-    PALLET_MAX_WEIGHT = 450
+    PALLET_MAX_WEIGHT = float("inf")
 
     # Read the customers request
     #orders = read_test("./bocchiotti_tests/test_20220519.csv")
@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
     for order_id, order in orders.items():
         start_time = time.time()
-        pallets = first_fit(order, generator, dubePacker)
+        pallets = best_fit(order, generator, dubePacker)
         end_time = time.time()
 
         print(f"Computational time: {end_time - start_time}s")

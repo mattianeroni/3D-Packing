@@ -231,15 +231,28 @@ def fit (currentItem, pallet, packed, layersMap):
 
 
 
+def preliminaryCheck (pallet, orderline):
+    """ Does the preliminary check to understand 
+    if an orderline can be stored into a pallet """
+    if pallet.weight + orderline.weight > pallet.maxWeight:
+        return False 
+
+    if pallet.volume + orderline.volume > pallet.maxVolume:
+        return False 
+
+    return True
+
+
+
 
 @functools.lru_cache(maxsize=1024)
-def cacheDubePacker (pallet, sortedCases):
+def cacheDubePacker (pallet, orderline):
     """ Same as dubePacker but caching the results """
-    return dubePacker(pallet, sortedCases)
+    return dubePacker(pallet, orderline)
 
 
 
-def dubePacker (pallet, sortedCases):
+def dubePacker (pallet, orderline):
     """
      The algorithm implemented in this method is a modified version of the one proposed by:
      Dube, E., Kanavathy, L. R., & Woodview, P. (2006). Optimizing Three-Dimensional
@@ -254,7 +267,7 @@ def dubePacker (pallet, sortedCases):
 
 
      :param pallet: The pallet in which cases must be placed.
-     :param sortedCases: (tuple) The cases to place, in the order in which they should be considered 
+     :param orderline: An orderline containing the cases to place (must be iterable).
 
      :return: <tuple> The first element is True if the packing has been successful
                 and False otherwise, the second returns the set of packed items with
@@ -271,12 +284,16 @@ def dubePacker (pallet, sortedCases):
     # corresponding to each OrderLine
     layersMap = HashableDict(pallet.layersMap)
 
+    # Preliminary check before computing expensive controls
+    if not preliminaryCheck(pallet, orderline):
+        return False, packed, layersMap
+
     # Deprecated..
     # Sort cases for decreasing strength
     #sortedCases = sorted(hosted, key=operator.attrgetter('strength'), reverse=True)
 
     # For each item to pack
-    for currentItem in sortedCases:
+    for currentItem in orderline.cases:
         currentItem = currentItem.__copy__()
         currentItem.busyCorners = [False, False, False]
         currentItem.canHold = currentItem.strength
